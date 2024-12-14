@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Artist Details</title>
+    <link rel="stylesheet" href="/static/style/parent.css" />
+    <link rel="stylesheet" href="/static/style/details.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-content">
+        <a href="/">
+          <h1>Groupie Tracker</h1>
+        </a>
+      </div>
+    </header>
+
+    <main class="main-content" id="main-content">
+      <!-- Back Link -->
+      <div class="back-link">
+        <a href="/" class="back-button"><i class="fa-solid fa-house"></i></a>
+      </div>
+      <!-- Artist Image and Name Section -->
+      <div class="artist-header">
+        <img src="{{.Image}}" alt="{{.Name}}" class="artist-image" />
+        <div class="artist-info">
+          <h1>{{.Name}}</h1>
+          <p class="creation-date">
+            <strong>Creation Date:</strong> {{.CreationDate}}
+          </p>
+          <p class="first-album">
+            <strong>First Album:</strong> {{.FirstAlbum}}
+          </p>
+        </div>
+      </div>
+
+      <!-- Members Section -->
+      <section class="members-section">
+        <h2>Band Members</h2>
+        <ul class="members-list">
+          <li>{{range .Members}}</li>
+          <li class="item-section">{{.}}</li>
+          <li>{{end}}</li>
+        </ul>
+      </section>
+      <section class="locations-section">
+        <h2>Locations</h2>
+        <ul class="locations-list">
+          <li>{{range .Location}}</li>
+          <li class="item-section">{{.}}</li>
+          <li>{{end}}</li>
+        </ul>
+      </section>
+
+      <!-- Dates Table -->
+      <section class="dates-section">
+        <h2>Dates</h2>
+        <ul class="dates-list">
+          <li>{{range .ConcertDate}}</li>
+          <li class="item-section">{{.}}</li>
+          <li>{{end}}</li>
+        </ul>
+      </section>
+      <section class="table-sections">
+        <!-- Concert Info Table -->
+        <div class="concert-info">
+          <h2>Concert Information</h2>
+          <table class="concert-table">
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Dates</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range $location, $dates := .Relation}}
+              <tr>
+                <td>{{ $location }}</td>
+                <td>
+                  {{range $index, $date := $dates}} {{ $date }}<br />
+                  {{end}}
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="map-container">
+        <div id="loading-spinner" class="loading">
+          
+        </div>
+        <div id="map" class="map"></div>
+      </div>
+    </main>
+
+    <footer class="main-footer">
+      <p>&copy; 2024 Groupie Tracker | All Rights Reserved</p>
+    </footer>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script>
+      window.addEventListener("DOMContentLoaded", async () => {
+  const loadingSpinner = document.getElementById("loading-spinner");
+  const main = document.getElementById("main-content");
+  
+  // Show the spinner before starting the map loading
+  loadingSpinner.classList.add("loading");
+
+  // Initialize the map with a default position (this step happens right away)
+  const map = L.map("map").setView([51.505, -0.09], 2);
+  await L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+
+  // Fetch the geolocation data for the artist
+  const artistId = window.location.pathname
+    .split("/")
+    .filter(Boolean)
+    .pop();
+  
+  try {
+    const response = await fetch(`/api/geocoding?id=${artistId}`);
+    if (!response.ok) {
+      main.innerHTML = `
+        <h1>Error fetching geolocation data</h1>
+        <h3>There was an error fetching the geolocation data for this artist. Please try again later.</h3>
+      `
+      main.style.minHeight = "100px";
+    }
+
+    // Parse the geolocation data
+    const geoLocations = await response.json();
+    const bounds = L.latLngBounds();
+
+    // Add markers for each location to the map
+    for (const [location, coords] of Object.entries(geoLocations)) {
+      bounds.extend(coords);
+      L.marker(coords).addTo(map).bindPopup(location);
+    }
+    
+    // Adjust map bounds to fit all markers
+    map.fitBounds(bounds);
+  } catch (error) {
+    console.error("Error fetching geolocation data:", error);
+  } finally {
+    // Hide the spinner once data is loaded and the map is set up
+    loadingSpinner.classList.remove("loading");
+  }
+});
+
+    </script>
+  </body>
+</html>

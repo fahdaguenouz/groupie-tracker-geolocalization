@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/style/err.css" />
+    <link rel="stylesheet" href="/static/style/parent.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"  />
+
+    <title>Document</title>
+  </head>
+  <body>
+    <header class="main-header">
+      <section class="header-content">
+        <a href="/">
+          <h1>Groupie Tracker</h1>
+        </a>
+      </section>
+    </header>
+
+    <main class="main-content-err" id="main-content">
+        
+        <h1>{{.StatusCode}} | {{.Message}}</h1>
+        <div>
+          <a class="link" href="/"><i class="fa-solid fa-house"></i></a>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+      <p>&copy; 2024 Groupie Tracker | All Rights Reserved</p>
+    </footer>
+  </body>
+</html>

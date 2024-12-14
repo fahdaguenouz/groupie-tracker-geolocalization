@@ -1,0 +1,39 @@
+main {
+    font-family: 'Arial', sans-serif;
+    color: white;
+   
+}
+
+h1 {
+    
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+
+
+/* Main Content-err Section */
+.main-content-err {
+    text-align: center;
+    padding: 50px 20px;
+    min-height: 65vh;
+    margin: 0 auto;
+    margin-top: 50px;
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+}
+
+
+
+
+.link {
+    backdrop-filter: blur(5px);
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 48px;
+    color: white;
+}
+
+a:hover {
+    color: rgb(223, 222, 222);
+}
